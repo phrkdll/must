@@ -1,39 +1,12 @@
-package must
+package must_test
 
 import (
 	"errors"
 	"testing"
 
+	"github.com/phrkdll/must/pkg/must"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestSucceed(t *testing.T) {
-	type testCase struct {
-		name string
-		err  error
-	}
-
-	testCases := []testCase{
-		{
-			name: "function returns error",
-			err:  errors.New("something was wrong"),
-		},
-		{
-			name: "function returns nil",
-			err:  nil,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			if tc.err == nil {
-				assert.NotPanics(t, func() { Succeed(tc.err) })
-			} else {
-				assert.Panics(t, func() { Succeed(tc.err) })
-			}
-		})
-	}
-}
 
 func TestReturn(t *testing.T) {
 	type testCase struct {
@@ -46,7 +19,7 @@ func TestReturn(t *testing.T) {
 		{
 			name: "error is not nil",
 			val:  nil,
-			err:  errors.New("something was wrong"),
+			err:  errors.New("something went wrong"),
 		},
 		{
 			name: "value is string",
@@ -63,11 +36,11 @@ func TestReturn(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.err == nil {
-				res := Return(tc.val, tc.err)
+				res := must.Return(tc.val, tc.err)
 
 				assert.Equal(t, tc.val, res)
 			} else {
-				assert.Panics(t, func() { Return(tc.val, tc.err) })
+				assert.Panics(t, func() { must.Return(tc.val, tc.err) })
 			}
 		})
 	}
@@ -84,7 +57,7 @@ func TestReturnOne(t *testing.T) {
 		{
 			name: "error is not nil",
 			val:  nil,
-			err:  errors.New("something was wrong"),
+			err:  errors.New("something went wrong"),
 		},
 		{
 			name: "value is string",
@@ -101,11 +74,11 @@ func TestReturnOne(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.err == nil {
-				res := ReturnOne(tc.val, tc.err)
+				res := must.ReturnOne(tc.val, tc.err)
 
 				assert.Equal(t, tc.val, res)
 			} else {
-				assert.Panics(t, func() { ReturnOne(tc.val, tc.err) })
+				assert.Panics(t, func() { must.ReturnOne(tc.val, tc.err) })
 			}
 		})
 	}
@@ -122,7 +95,7 @@ func TestReturnTwo(t *testing.T) {
 		{
 			name: "error is not nil",
 			vals: nil,
-			err:  errors.New("something was wrong"),
+			err:  errors.New("something went wrong"),
 		},
 		{
 			name: "value is string",
@@ -139,12 +112,12 @@ func TestReturnTwo(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.err == nil {
-				res0, res1 := ReturnTwo(tc.vals[0], tc.vals[1], tc.err)
+				res0, res1 := must.ReturnTwo(tc.vals[0], tc.vals[1], tc.err)
 
 				assert.Equal(t, tc.vals[0], res0)
 				assert.Equal(t, tc.vals[1], res1)
 			} else {
-				assert.Panics(t, func() { ReturnTwo(tc.vals[0], tc.vals[1], tc.err) })
+				assert.Panics(t, func() { must.ReturnTwo(tc.vals[0], tc.vals[1], tc.err) })
 			}
 		})
 	}
@@ -161,7 +134,7 @@ func TestReturnThree(t *testing.T) {
 		{
 			name: "error is not nil",
 			vals: nil,
-			err:  errors.New("something was wrong"),
+			err:  errors.New("something went wrong"),
 		},
 		{
 			name: "value is string",
@@ -178,13 +151,13 @@ func TestReturnThree(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.err == nil {
-				res0, res1, res2 := ReturnThree(tc.vals[0], tc.vals[1], tc.vals[2], tc.err)
+				res0, res1, res2 := must.ReturnThree(tc.vals[0], tc.vals[1], tc.vals[2], tc.err)
 
 				assert.Equal(t, tc.vals[0], res0)
 				assert.Equal(t, tc.vals[1], res1)
 				assert.Equal(t, tc.vals[2], res2)
 			} else {
-				assert.Panics(t, func() { ReturnThree(tc.vals[0], tc.vals[1], tc.vals[2], tc.err) })
+				assert.Panics(t, func() { must.ReturnThree(tc.vals[0], tc.vals[1], tc.vals[2], tc.err) })
 			}
 		})
 	}
