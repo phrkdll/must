@@ -1,6 +1,6 @@
 # must ![coverage](https://raw.githubusercontent.com/phrkdll/must/badges/.badges/main/coverage.svg)
 
-A simple package providing easy access to several function that cover the must-pattern, which is often utilized in Go.
+A simple package providing easy access to several functions that cover the must-pattern, which is often utilized in Go.
 
 ## Usage
 
