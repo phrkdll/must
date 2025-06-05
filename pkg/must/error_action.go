@@ -4,26 +4,22 @@ type errorAction struct {
 	err error
 }
 
-type ResponseWriter interface {
+type responseWriter interface {
 	WriteHeader(int)
 	Write([]byte) (int, error)
 }
 
 func newErrorAction(err error) errorAction {
-	return errorAction{err: err}
+	return errorAction{err}
 }
 
-func (ea errorAction) Respond(w ResponseWriter, status int) {
+func (ea errorAction) Respond(w responseWriter, statusCode int) {
 	if ea.err != nil {
-		w.WriteHeader(status)
+		w.WriteHeader(statusCode)
 		w.Write([]byte(ea.err.Error()))
 	}
 }
 
 func (ea errorAction) Panic() {
 	Succeed(ea.err)
-}
-
-func SucceedOr(err error) errorAction {
-	return newErrorAction(err)
 }
