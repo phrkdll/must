@@ -26,8 +26,18 @@ func someFunc(val string) error {
 
     return nil
 }
-
+    
 must.Succeed(someFunc(""))
-```
+// Alternative usage
+must.SucceedOr(someFunc("")).Panic()
 
-The *must.Succeed(err error)* function internally calls *panic(err)* if a non-nil error is passed.
+func divide(dividend, divisor float64) (float64, error) {
+    if divisor == 0.0 {
+        return 0.0, errors.New("can't divide by zero")
+    }
+
+    return dividend / divisor, nil
+}
+
+quotient := must.Return(divide(1, 2))
+```
