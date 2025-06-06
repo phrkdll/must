@@ -16,20 +16,9 @@ Use the package:
 package main
 
 import (
+    "net/http"
     "github.com/phrkdll/must/pkg/must"
 )
-
-func someFunc(val string) error {
-    if val == "" {
-        return errors.New("val must not be empty")
-    }
-
-    return nil
-}
-    
-must.Succeed(someFunc(""))
-// Alternative usage
-must.SucceedOr(someFunc("")).Panic()
 
 func divide(dividend, divisor float64) (float64, error) {
     if divisor == 0.0 {
@@ -39,5 +28,26 @@ func divide(dividend, divisor float64) (float64, error) {
     return dividend / divisor, nil
 }
 
-quotient := must.Return(divide(1, 2))
+func someOtherFunc(val string) error {
+    if val == "" {
+        return errors.New("val must not be empty")
+    }
+
+    return nil
+}
+
+func someHandler(w http.ResponseWriter, r *http.Request) {
+	defer must.Recover()
+	// OR
+	defer must.RecoverWith(func(err error) { 
+		// ... 
+	})
+
+	must.Succeed(someOtherFunc("")).ElseRespond(w, http.StatusInternalServerError).ElsePanic()
+	// OR
+	quotient := must.Return(divide(1, 2)).ElseRespond(w, http.StatusInternalServerError).ElsePanic()
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte{byte(quotient)})
+}
 ```
