@@ -46,14 +46,16 @@ func TestSucceedOr(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var mrw mockResponseWriter
-			must.SucceedOr(tc.err).Respond(&mrw, tc.statusCode)
+			panicer := must.SucceedOr(tc.err).Respond(&mrw, tc.statusCode)
 
 			if tc.err != nil {
 				assert.Equal(t, tc.err, mrw.Error)
+				assert.Equal(t, tc.err, panicer.Err())
 				assert.Equal(t, tc.statusCode, mrw.StatusCode)
 				assert.Panics(t, func() { must.SucceedOr(tc.err).Panic() })
 			} else {
 				assert.NotPanics(t, func() { must.SucceedOr(tc.err).Panic() })
+				assert.Nil(t, panicer.Err())
 				assert.Nil(t, mrw.Error)
 				assert.Zero(t, mrw.StatusCode)
 			}
