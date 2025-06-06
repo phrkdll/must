@@ -1,7 +1,5 @@
 package must
 
-func Succeed(err error) {
-	if err != nil {
-		panic(err)
-	}
+func Succeed(err error) UntypedResult {
+	return NewResult(err)
 }

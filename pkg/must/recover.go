@@ -1,12 +1,16 @@
 package must
 
-type function func(error)
+type recoverFunction func(error)
 
+// Recover without custom error handling
+// (ignores the error returned by Go's recover function)
 func Recover() {
 	_ = recover()
 }
 
-func RecoverWith(fn function) {
+// Recover with custom error handling
+// (passes the error returned by Go's recover function to the passed recoverFunction)
+func RecoverWith(fn recoverFunction) {
 	err := recover()
 
 	if err != nil {
