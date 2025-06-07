@@ -37,27 +37,31 @@ func someOtherFunc(val string) error {
 }
 
 func someHandler(w http.ResponseWriter, r *http.Request) {
-	defer must.Recover()
-	// OR
-	defer must.RecoverWith(func(err error) { 
-		// ... 
-	})
+    defer must.Recover()
+    // OR
+    defer must.RecoverWith(func(err error) {
+        // ... 
+    })
 
     // Without value return
-	must.Succeed(someOtherFunc("")).ElseRespond(w, http.StatusInternalServerError)
+    must.Succeed(someOtherFunc("")).ElseRespond(w, http.StatusInternalServerError)
     // OR
-    must.Succeed(someOtherFunc("")).ElseExecute(func () { fmt.Println("panicing!") })
+    must.Succeed(someOtherFunc("")).ElseExecute(func () {
+        fmt.Println("panicing!")
+    })
     // OR
     must.Succeed(someOtherFunc("")).ElsePanic()
 
-	// With value return
-	quotient := must.Return(divide(1, 0)).ElseRespond(w, http.StatusInternalServerError)
+    // With value return
+    quotient := must.Return(divide(1, 0)).ElseRespond(w, http.StatusInternalServerError)
     // OR
-    quotient := must.Return(divide(1, 0)).ElseExecute(func (val any) { fmt.Println("panicing!") })
+    quotient := must.Return(divide(1, 0)).ElseExecute(func (val any) {
+        fmt.Println("panicing!")
+    })
     // OR
     quotient := must.Return(divide(1, 0)).ElsePanic()
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte{byte(quotient)})
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte{byte(quotient)})
 }
 ```
