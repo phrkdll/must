@@ -4,31 +4,31 @@ type UntypedResult struct {
 	err error
 }
 
-type UntypedPanicer interface {
-	Result
-	ElsePanic()
-}
+type ResultAction func()
 
 func NewResult(err error) UntypedResult {
 	return UntypedResult{err}
 }
 
-func (ea UntypedResult) Err() error {
-	return ea.err
-}
-
-func (ea UntypedResult) ElseRespond(w ResponseWriter, statusCode int) UntypedPanicer {
-	if ea.err != nil {
+func (res UntypedResult) ElseRespond(w ResponseWriter, statusCode int) {
+	if res.err != nil {
 		w.WriteHeader(statusCode)
-		w.Write([]byte(ea.err.Error()))
-	}
+		w.Write([]byte(res.err.Error()))
 
-	return ea
+		panic(res.err)
+	}
 }
 
-// Panics if ea.Err() is not nil
-func (ea UntypedResult) ElsePanic() {
-	if ea.Err() != nil {
-		panic(ea.Err())
+func (res UntypedResult) ElseExecute(fn ResultAction) {
+	if res.err != nil {
+		fn()
+
+		panic(res.err)
+	}
+}
+
+func (res UntypedResult) ElsePanic() {
+	if res.err != nil {
+		panic(res.err)
 	}
 }

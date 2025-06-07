@@ -31,16 +31,20 @@ func TestSucceed(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var writer must.MockResponseWriter
-			panicer := must.Succeed(tc.err).ElseRespond(&writer, tc.statusCode)
+			tester := &must.ExecuteTester{}
 
 			if tc.err != nil {
-				assert.Equal(t, tc.err, writer.Error)
-				assert.Equal(t, tc.err, panicer.Err())
-				assert.Equal(t, tc.statusCode, writer.StatusCode)
+				assert.Panics(t, func() { must.Succeed(tc.err).ElseRespond(&writer, tc.statusCode) })
+				assert.Panics(t, func() { must.Succeed(tc.err).ElseExecute(tester.TestUntyped) })
 				assert.Panics(t, func() { must.Succeed(tc.err).ElsePanic() })
+				assert.True(t, tester.Called)
+				assert.Equal(t, tc.err, writer.Error)
+				assert.Equal(t, tc.statusCode, writer.StatusCode)
 			} else {
+				assert.NotPanics(t, func() { must.Succeed(tc.err).ElseRespond(&writer, tc.statusCode) })
+				assert.NotPanics(t, func() { must.Succeed(tc.err).ElseExecute(tester.TestUntyped) })
 				assert.NotPanics(t, func() { must.Succeed(tc.err).ElsePanic() })
-				assert.Nil(t, panicer.Err())
+				assert.False(t, tester.Called)
 				assert.Nil(t, writer.Error)
 				assert.Zero(t, writer.StatusCode)
 			}
