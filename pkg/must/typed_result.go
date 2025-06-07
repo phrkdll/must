@@ -5,30 +5,37 @@ type TypedResult[T any] struct {
 	val T
 }
 
-type TypedPanicer[T any] interface {
-	Result
-	ElsePanic() T
+type TypedResultAction[T any] func(T)
+
+func NewTypedResult[T any](res UntypedResult, val T) TypedResult[T] {
+	return TypedResult[T]{res, val}
 }
 
-func NewTypedResult[T any](ea UntypedResult, val T) TypedResult[T] {
-	return TypedResult[T]{ea, val}
-}
-
-func (ea TypedResult[T]) ElseRespond(w ResponseWriter, statusCode int) TypedPanicer[T] {
-	if ea.Err() != nil {
+func (res TypedResult[T]) ElseRespond(w ResponseWriter, statusCode int) T {
+	if res.err != nil {
 		w.WriteHeader(statusCode)
-		w.Write([]byte(ea.Err().Error()))
+		w.Write([]byte(res.err.Error()))
+
+		panic(res.err)
 	}
 
-	return ea
+	return res.val
 }
 
-// Panics if ea.Err() is not nil
-// Otherwise returns the value from the original function
-func (ea TypedResult[T]) ElsePanic() T {
-	if ea.Err() != nil {
-		panic(ea.Err())
+func (res TypedResult[T]) ElseExecute(fn TypedResultAction[T]) T {
+	if res.err != nil {
+		fn(res.val)
+
+		panic(res.err)
 	}
 
-	return ea.val
+	return res.val
+}
+
+func (res TypedResult[T]) ElsePanic() T {
+	if res.err != nil {
+		panic(res.err)
+	}
+
+	return res.val
 }

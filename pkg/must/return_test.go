@@ -41,17 +41,22 @@ func TestReturn(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var writer must.MockResponseWriter
-			panicer := must.Return(tc.val, tc.err).ElseRespond(&writer, tc.statusCode)
+			tester := &must.ExecuteTester{}
 
 			if tc.err != nil {
+				assert.Panics(t, func() { must.Return(tc.val, tc.err).ElseRespond(&writer, tc.statusCode) })
+				assert.Panics(t, func() { must.Return(tc.val, tc.err).ElseExecute(tester.TestTyped) })
+				assert.Panics(t, func() { must.Return(tc.val, tc.err).ElsePanic() })
+				assert.True(t, tester.Called)
 				assert.Equal(t, tc.err, writer.Error)
-				assert.Equal(t, tc.err, panicer.Err())
 				assert.Equal(t, tc.statusCode, writer.StatusCode)
-				assert.Panics(t, func() { panicer.ElsePanic() })
 			} else {
-				assert.NotPanics(t, func() { panicer.ElsePanic() })
-				assert.Equal(t, tc.val, panicer.ElsePanic())
-				assert.Nil(t, panicer.Err())
+				var result any
+				assert.NotPanics(t, func() { result = must.Return(tc.val, tc.err).ElseRespond(&writer, tc.statusCode) })
+				assert.NotPanics(t, func() { must.Return(tc.val, tc.err).ElseExecute(tester.TestTyped) })
+				assert.NotPanics(t, func() { must.Return(tc.val, tc.err).ElsePanic() })
+				assert.False(t, tester.Called)
+				assert.Equal(t, tc.val, result)
 				assert.Nil(t, writer.Error)
 				assert.Zero(t, writer.StatusCode)
 			}
