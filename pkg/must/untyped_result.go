@@ -3,20 +3,22 @@ package must
 import "encoding/json"
 
 type UntypedResult struct {
-	err          error  `json:"-"`
-	HasError     bool   `json:"hasError"`
-	ErrorMessage string `json:"errorMessage,omitempty"`
+	err     error  `json:"-"`
+	Success bool   `json:"success"`
+	Error   bool   `json:"error"`
+	Message string `json:"message,omitempty"`
 }
 
 type ResultAction func()
 
 func NewResult(err error) UntypedResult {
 	var errorMessage string
-	if err != nil {
+	hasError := err != nil
+	if hasError {
 		errorMessage = err.Error()
 	}
 
-	return UntypedResult{err, err != nil, errorMessage}
+	return UntypedResult{err, !hasError, hasError, errorMessage}
 }
 
 func (res UntypedResult) ElseRespond(w ResponseWriter, statusCode int) {

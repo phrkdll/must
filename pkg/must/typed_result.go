@@ -6,13 +6,13 @@ import (
 
 type TypedResult[T any] struct {
 	UntypedResult
-	Val T `json:"val"`
+	Data T `json:"data"`
 }
 
 type TypedResultAction[T any] func(T)
 
-func NewTypedResult[T any](res UntypedResult, val T) TypedResult[T] {
-	return TypedResult[T]{res, val}
+func NewTypedResult[T any](res UntypedResult, data T) TypedResult[T] {
+	return TypedResult[T]{res, data}
 }
 
 func (res TypedResult[T]) ElseRespond(w ResponseWriter, statusCode int) T {
@@ -29,17 +29,17 @@ func (res TypedResult[T]) ElseRespond(w ResponseWriter, statusCode int) T {
 		panic(res.err)
 	}
 
-	return res.Val
+	return res.Data
 }
 
 func (res TypedResult[T]) ElseExecute(fn TypedResultAction[T]) T {
 	if res.err != nil {
-		fn(res.Val)
+		fn(res.Data)
 
 		panic(res.err)
 	}
 
-	return res.Val
+	return res.Data
 }
 
 func (res TypedResult[T]) ElsePanic() T {
@@ -47,5 +47,5 @@ func (res TypedResult[T]) ElsePanic() T {
 		panic(res.err)
 	}
 
-	return res.Val
+	return res.Data
 }
