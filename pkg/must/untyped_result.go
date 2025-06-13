@@ -4,6 +4,7 @@ import "encoding/json"
 
 type UntypedResult struct {
 	err          error  `json:"-"`
+	HasError     bool   `json:"hasError"`
 	ErrorMessage string `json:"errorMessage,omitempty"`
 }
 
@@ -15,7 +16,7 @@ func NewResult(err error) UntypedResult {
 		errorMessage = err.Error()
 	}
 
-	return UntypedResult{err, errorMessage}
+	return UntypedResult{err, err != nil, errorMessage}
 }
 
 func (res UntypedResult) ElseRespond(w ResponseWriter, statusCode int) {

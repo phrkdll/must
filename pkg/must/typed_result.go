@@ -6,7 +6,7 @@ import (
 
 type TypedResult[T any] struct {
 	UntypedResult
-	Val T
+	Val T `json:"val"`
 }
 
 type TypedResultAction[T any] func(T)
