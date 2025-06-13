@@ -1,17 +1,15 @@
 package must
 
+import "net/http"
+
 type Result interface {
 	Err() error
 }
 
 type ResponseWriter interface {
-	Header() Header
+	Header() http.Header
 	WriteHeader(int)
 	Write([]byte) (int, error)
-}
-
-type Header interface {
-	Add(string, string)
 }
 
 type Responder interface {
