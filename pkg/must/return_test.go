@@ -12,7 +12,7 @@ import (
 func TestReturn(t *testing.T) {
 	type testCase struct {
 		name       string
-		val        any
+		data       any
 		err        error
 		statusCode int
 	}
@@ -20,19 +20,19 @@ func TestReturn(t *testing.T) {
 	testCases := []testCase{
 		{
 			name:       "error is not nil",
-			val:        nil,
+			data:       nil,
 			err:        errors.New("something went wrong"),
 			statusCode: http.StatusBadRequest,
 		},
 		{
 			name:       "value is string",
-			val:        "test",
+			data:       "test",
 			err:        nil,
 			statusCode: http.StatusOK,
 		},
 		{
 			name:       "value is float",
-			val:        1.1,
+			data:       1.1,
 			err:        nil,
 			statusCode: http.StatusOK,
 		},
@@ -44,19 +44,19 @@ func TestReturn(t *testing.T) {
 			tester := &must.ExecuteTester{}
 
 			if tc.err != nil {
-				assert.Panics(t, func() { must.Return(tc.val, tc.err).ElseRespond(&writer, tc.statusCode) })
-				assert.Panics(t, func() { must.Return(tc.val, tc.err).ElseExecute(tester.TestTyped) })
-				assert.Panics(t, func() { must.Return(tc.val, tc.err).ElsePanic() })
+				assert.Panics(t, func() { must.Return(tc.data, tc.err).ElseRespond(&writer, tc.statusCode) })
+				assert.Panics(t, func() { must.Return(tc.data, tc.err).ElseExecute(tester.TestTyped) })
+				assert.Panics(t, func() { must.Return(tc.data, tc.err).ElsePanic() })
 				assert.True(t, tester.Called)
 				assert.Contains(t, *writer.Error, tc.err.Error())
 				assert.Equal(t, tc.statusCode, writer.StatusCode)
 			} else {
 				var result any
-				assert.NotPanics(t, func() { result = must.Return(tc.val, tc.err).ElseRespond(&writer, tc.statusCode) })
-				assert.NotPanics(t, func() { must.Return(tc.val, tc.err).ElseExecute(tester.TestTyped) })
-				assert.NotPanics(t, func() { must.Return(tc.val, tc.err).ElsePanic() })
+				assert.NotPanics(t, func() { result = must.Return(tc.data, tc.err).ElseRespond(&writer, tc.statusCode) })
+				assert.NotPanics(t, func() { must.Return(tc.data, tc.err).ElseExecute(tester.TestTyped) })
+				assert.NotPanics(t, func() { must.Return(tc.data, tc.err).ElsePanic() })
 				assert.False(t, tester.Called)
-				assert.Equal(t, tc.val, result)
+				assert.Equal(t, tc.data, result)
 				assert.Nil(t, writer.Error)
 				assert.Zero(t, writer.StatusCode)
 			}
