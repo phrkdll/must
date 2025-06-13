@@ -38,7 +38,7 @@ func TestSucceed(t *testing.T) {
 				assert.Panics(t, func() { must.Succeed(tc.err).ElseExecute(tester.TestUntyped) })
 				assert.Panics(t, func() { must.Succeed(tc.err).ElsePanic() })
 				assert.True(t, tester.Called)
-				assert.Equal(t, tc.err, writer.Error)
+				assert.Contains(t, *writer.Error, tc.err.Error())
 				assert.Equal(t, tc.statusCode, writer.StatusCode)
 			} else {
 				assert.NotPanics(t, func() { must.Succeed(tc.err).ElseRespond(&writer, tc.statusCode) })

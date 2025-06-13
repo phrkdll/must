@@ -1,19 +1,33 @@
 package must
 
+import "encoding/json"
+
 type UntypedResult struct {
-	err error
+	err          error  `json:"-"`
+	ErrorMessage string `json:"errorMessage,omitempty"`
 }
 
 type ResultAction func()
 
 func NewResult(err error) UntypedResult {
-	return UntypedResult{err}
+	var errorMessage string
+	if err != nil {
+		errorMessage = err.Error()
+	}
+
+	return UntypedResult{err, errorMessage}
 }
 
 func (res UntypedResult) ElseRespond(w ResponseWriter, statusCode int) {
 	if res.err != nil {
+		json, err := json.Marshal(&res)
+		if err != nil {
+			panic(err)
+		}
+
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(statusCode)
-		w.Write([]byte(res.err.Error()))
+		w.Write(json)
 
 		panic(res.err)
 	}
