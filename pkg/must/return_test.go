@@ -48,7 +48,7 @@ func TestReturn(t *testing.T) {
 				assert.Panics(t, func() { must.Return(tc.val, tc.err).ElseExecute(tester.TestTyped) })
 				assert.Panics(t, func() { must.Return(tc.val, tc.err).ElsePanic() })
 				assert.True(t, tester.Called)
-				assert.Equal(t, tc.err, writer.Error)
+				assert.Contains(t, *writer.Error, tc.err.Error())
 				assert.Equal(t, tc.statusCode, writer.StatusCode)
 			} else {
 				var result any

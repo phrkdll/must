@@ -1,8 +1,12 @@
 package must
 
+import (
+	"encoding/json"
+)
+
 type TypedResult[T any] struct {
 	UntypedResult
-	val T
+	Val T
 }
 
 type TypedResultAction[T any] func(T)
@@ -13,23 +17,29 @@ func NewTypedResult[T any](res UntypedResult, val T) TypedResult[T] {
 
 func (res TypedResult[T]) ElseRespond(w ResponseWriter, statusCode int) T {
 	if res.err != nil {
+		json, err := json.Marshal(&res)
+		if err != nil {
+			panic(err)
+		}
+
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(statusCode)
-		w.Write([]byte(res.err.Error()))
+		w.Write(json)
 
 		panic(res.err)
 	}
 
-	return res.val
+	return res.Val
 }
 
 func (res TypedResult[T]) ElseExecute(fn TypedResultAction[T]) T {
 	if res.err != nil {
-		fn(res.val)
+		fn(res.Val)
 
 		panic(res.err)
 	}
 
-	return res.val
+	return res.Val
 }
 
 func (res TypedResult[T]) ElsePanic() T {
@@ -37,5 +47,5 @@ func (res TypedResult[T]) ElsePanic() T {
 		panic(res.err)
 	}
 
-	return res.val
+	return res.Val
 }
